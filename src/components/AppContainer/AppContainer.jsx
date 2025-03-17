@@ -43,7 +43,7 @@ function AppContainer() {
 
     <div className="app-container">
       <form action="" className="form-container">
-        <input type="text" placeholder="search for tV series" value={showTyped} onChange={(e) => {setShowTyped(e.target.value)}} />
+        <input type="text" placeholder="search for a tV series" value={showTyped} onChange={(e) => {setShowTyped(e.target.value)}} />
         <button onClick={handleSearch} disabled={loading}><FaSearch /></button>
       </form>
 
