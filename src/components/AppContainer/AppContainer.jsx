@@ -53,13 +53,13 @@ function AppContainer() {
 
       {showData && !loading && !error && 
       <div className="show-card-container">
-        <ShowCard showThumbnail={showData.image.original} showTitle={showData.name} rating={showData.rating.average} runtime={showData.runtime} weight={showData.weight} showData={showData} />
+        <ShowCard showThumbnail={showData.image.original} showTitle={showData.name} rating={showData.rating.average} runtime={showData.runtime} weight={showData.weight} trailerLink={`https://www.google.com/search?q=${showData.name} trailer`} showData={showData} />
       </div>}
     </div>
   );
 }
 
-function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, showData}) {
+function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, trailerLink, showData}) {
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(showData.summary, 'text/html');
@@ -104,7 +104,7 @@ function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, showData}
           </p>
 
           <div className="links-container">
-            <a href="#" className="watch-trailer-link"><FaPlay />watch trailer</a>
+            <a href={trailerLink} target="_blank" className="watch-trailer-link"><FaPlay />watch trailer</a>
             <a href="#" className="save-later-link"><FaBookmark />save for later</a>
           </div>
         </div>
