@@ -65,6 +65,10 @@ function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, showData}
     const doc = parser.parseFromString(showData.summary, 'text/html');
     const cleanSummary = doc.body.textContent || '';
 
+    if (!runtime) {
+      runtime = "--"
+    }
+
     return(
         <div className="show-card">
         <div className="show-card-left">
