@@ -1,4 +1,4 @@
-import { FaRegStar, FaPlay, FaBookmark, FaSearch } from "react-icons/fa";
+import { FaRegStar, FaPlay, FaBookmark, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa6";
 import { PiHeartStraightBold } from "react-icons/pi";
 import { useState } from "react";
@@ -53,13 +53,40 @@ function AppContainer() {
 
       {showData && !loading && !error && 
       <div className="show-card-container">
-        <ShowCard showThumbnail={showData.image.original} showTitle={showData.name} rating={showData.rating.average} runtime={showData.runtime} weight={showData.weight} trailerLink={`https://www.google.com/search?q=${showData.name} trailer`} showData={showData} />
+        <ShowCard key={showData.id} showThumbnail={showData.image.original} showTitle={showData.name} rating={showData.rating.average } runtime={showData.runtime} weight={showData.weight} premiered={showData.premiered} ended={showData.ended} trailerLink={`https://www.google.com/search?q=${showData.name} trailer`} showData={showData} />
       </div>}
     </div>
   );
 }
 
-function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, trailerLink, showData}) {
+function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, premiered, ended, trailerLink, showData}) {
+  let premieredYear = "";
+  let endedYear = "";
+
+  const premieredCharacters = premiered.split('');
+  const premieredFirstFourCharacters = premieredCharacters.slice(0, 4);
+
+  for(let i = 0; i<premieredFirstFourCharacters.length; i++) {
+    premieredYear += premieredFirstFourCharacters[i];
+  }
+    
+  if (ended) {
+
+      const endedCharacters = ended.split('');
+      const endedFirstFourCharacters = endedCharacters.slice(0, 4);
+
+      for(let i = 0; i<endedFirstFourCharacters.length; i++) {
+        endedYear += endedFirstFourCharacters[i];
+      }
+    } else{
+      endedYear = "present";
+    }
+
+
+
+
+
+
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(showData.summary, 'text/html');
@@ -67,6 +94,10 @@ function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, trailerLi
 
     if (!runtime) {
       runtime = "--"
+    }
+
+    if (!rating) {
+      rating = "unrated"
     }
 
     return(
@@ -79,13 +110,13 @@ function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, trailerLi
           <h1 className="show-title">{showTitle}</h1>
           <div className="genres-container">
             {
-                showData.genres.map((genre) => <p className="genre">{genre}</p>)
+                showData.genres.map((genre) => <p key={Math.random()} className="genre">{genre}</p>)
             }
           </div>
           <div className="show-details-container">
             <div className="detail-container">
             <FaRegStar />
-              <p>imdb: {rating} / 10</p>
+              <p>imdb: {rating}</p>
             </div>
 
             <div className="detail-container">
@@ -95,7 +126,12 @@ function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, trailerLi
 
             <div className="detail-container">
             <PiHeartStraightBold />
-              <p className="hearts">{weight}% liked this</p>
+              <p className="hearts">{weight}%</p>
+            </div>
+
+            <div className="detail-container">
+            <FaRegCalendarAlt />
+              <p>{premieredYear} - {endedYear}</p>
             </div>
           </div>
 
