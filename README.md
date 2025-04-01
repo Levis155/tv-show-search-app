@@ -1,8 +1,10 @@
-# React + Vite
+# Description 
+I built this Tv shows search app as a personal project. It includes a search bar for input by the user and uses the useState React hook to alter and monitor state.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Interface
 
-Currently, two official plugins are available:
+<img src="./src/assets/Screenshot (202).png" alt="">
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Functionality
+
+<img src="./src/assets/Screenshot (203).png" alt="">
