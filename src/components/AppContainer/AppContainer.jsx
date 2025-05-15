@@ -1,151 +1,174 @@
-import { FaRegStar, FaPlay, FaBookmark, FaSearch, FaRegCalendarAlt } from "react-icons/fa";
+import {
+  FaRegStar,
+  FaPlay,
+  FaBookmark,
+  FaSearch,
+  FaRegCalendarAlt,
+} from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa6";
 import { PiHeartStraightBold } from "react-icons/pi";
 import { useState } from "react";
-import "./AppContainer.css"
+import "./AppContainer.css";
 import PulseLoader from "react-spinners/PulseLoader";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { format } from "date-fns";
 
 function AppContainer() {
-    const [showTyped, setShowTyped] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const [showData, setShowData] = useState(null);
+  const [searchedShow, setSearchedShow] = useState("");
 
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["get-show-data"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `https://api.tvmaze.com/singlesearch/shows?q=${searchedShow}`
+      );
+      console.log(response.data);
+      return response.data;
+    },
+    enabled: false,
+  });
 
-    async function handleSearch(e) {
-        e.preventDefault();
-
-        try{
-           setLoading(true);
-           setError(false);
-           setShowData(null);
-
-           const response = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${showTyped}`);
-           const data = await response.json();
-
-           if(!response.ok) {
-            throw new Error("There was an error")
-           }
-
-           setShowData(data);
-           console.log(data);
-        } catch{
-            setError("could not find your show")
-        }finally{
-            setLoading(false)
-        }
-    }
-
-
+  async function handleSearch(e) {
+    e.preventDefault();
+    refetch();
+  }
 
   return (
-
-
     <div className="app-container">
-      <form action="" className="form-container">
-        <input type="text" placeholder="search for a tV series" value={showTyped} onChange={(e) => {setShowTyped(e.target.value)}} />
-        <button onClick={handleSearch} disabled={loading}><FaSearch /></button>
+      <form action="" className="form-container" onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="search for a tV series"
+          value={searchedShow}
+          onChange={(e) => {
+            setSearchedShow(e.target.value);
+          }}
+        />
+        <button>
+          <FaSearch />
+        </button>
       </form>
 
-      {loading && <div className="loader-container"><PulseLoader size={30} color="#f5c417" /></div> }
+      {isLoading && (
+        <div className="loader-container">
+          <PulseLoader size={30} color="#f5c417" />
+        </div>
+      )}
 
-      {error && <div className="error-container"><h1>{error}</h1></div>}
+      {isError && (
+        <div className="error-container">
+          <h1>something went wrong</h1>
+        </div>
+      )}
 
-      {showData && !loading && !error && 
-      <div className="show-card-container">
-        <ShowCard key={showData.id} showThumbnail={showData.image.original} showTitle={showData.name} rating={showData.rating.average } runtime={showData.runtime} weight={showData.weight} premiered={showData.premiered} ended={showData.ended} trailerLink={`https://www.google.com/search?q=${showData.name} trailer`} showData={showData} />
-      </div>}
+      {data && (
+        <div className="show-card-container">
+          <ShowCard
+            key={data.id}
+            showThumbnail={data.image.original}
+            showTitle={data.name}
+            rating={data.rating.average}
+            runtime={data.runtime}
+            weight={data.weight}
+            premiered={data.premiered}
+            ended={data.ended}
+            trailerLink={`https://www.google.com/search?q=${data.name} trailer`}
+            data={data}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-function ShowCard({ showThumbnail, showTitle, rating, runtime, weight, premiered, ended, trailerLink, showData}) {
-  let premieredYear = "";
-  let endedYear = "";
+function ShowCard({
+  showThumbnail,
+  showTitle,
+  rating,
+  runtime,
+  weight,
+  premiered,
+  ended,
+  trailerLink,
+  data,
+}) {
+  const formattedPremierDate = format(new Date(premiered), "MMM yyyy");
+  let formattedEndDate;
 
-  const premieredCharacters = premiered.split('');
-  const premieredFirstFourCharacters = premieredCharacters.slice(0, 4);
-
-  for(let i = 0; i<premieredFirstFourCharacters.length; i++) {
-    premieredYear += premieredFirstFourCharacters[i];
+  if(!ended){
+    formattedEndDate="present"
+  }else{
+    formattedEndDate = format(new Date(ended), "MMM yyyy");
   }
-    
-  if (ended) {
-
-      const endedCharacters = ended.split('');
-      const endedFirstFourCharacters = endedCharacters.slice(0, 4);
-
-      for(let i = 0; i<endedFirstFourCharacters.length; i++) {
-        endedYear += endedFirstFourCharacters[i];
-      }
-    } else{
-      endedYear = "present";
-    }
 
 
+  if (!runtime) {
+    runtime = "--";
+  }
 
+  if (!rating) {
+    rating = "unrated";
+  }
 
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(data.summary, "text/html");
+  const cleanSummary = doc.body.textContent || "";
 
+  return (
+    <div className="show-card">
+      <div className="show-card-left">
+        <img src={showThumbnail} alt="" />
+      </div>
 
+      <div className="show-card-right">
+        <h1 className="show-title">{showTitle}</h1>
+        <div className="genres-container">
+          {data.genres.map((genre) => (
+            <p key={Math.random()} className="genre">
+              {genre}
+            </p>
+          ))}
+        </div>
+        <div className="show-details-container">
+          <div className="detail-container">
+            <FaRegStar />
+            <p>imdb: {rating}</p>
+          </div>
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(showData.summary, 'text/html');
-    const cleanSummary = doc.body.textContent || '';
+          <div className="detail-container">
+            <FaRegClock />
+            <p className="run-time">{runtime} minutes</p>
+          </div>
 
-    if (!runtime) {
-      runtime = "--"
-    }
+          <div className="detail-container">
+            <PiHeartStraightBold />
+            <p className="hearts">{weight}%</p>
+          </div>
 
-    if (!rating) {
-      rating = "unrated"
-    }
-
-    return(
-        <div className="show-card">
-        <div className="show-card-left">
-            <img src={showThumbnail} alt="" />
+          <div className="detail-container">
+            <FaRegCalendarAlt />
+            <p>
+              {formattedPremierDate} - {!formattedEndDate ? "present" : formattedEndDate}
+            </p>
+          </div>
         </div>
 
-        <div className="show-card-right">
-          <h1 className="show-title">{showTitle}</h1>
-          <div className="genres-container">
-            {
-                showData.genres.map((genre) => <p key={Math.random()} className="genre">{genre}</p>)
-            }
-          </div>
-          <div className="show-details-container">
-            <div className="detail-container">
-            <FaRegStar />
-              <p>imdb: {rating}</p>
-            </div>
+        <p className="show-excerpt">{cleanSummary}</p>
 
-            <div className="detail-container">
-            <FaRegClock />
-              <p className="run-time">{runtime} minutes</p>
-            </div>
-
-            <div className="detail-container">
-            <PiHeartStraightBold />
-              <p className="hearts">{weight}%</p>
-            </div>
-
-            <div className="detail-container">
-            <FaRegCalendarAlt />
-              <p>{premieredYear} - {endedYear}</p>
-            </div>
-          </div>
-
-          <p className="show-excerpt">
-            {cleanSummary}
-          </p>
-
-          <div className="links-container">
-            <a href={trailerLink} target="_blank" className="watch-trailer-link"><FaPlay />watch trailer</a>
-            <a href="#" className="save-later-link"><FaBookmark />save for later</a>
-          </div>
+        <div className="links-container">
+          <a href={trailerLink} target="_blank" className="watch-trailer-link">
+            <FaPlay />
+            watch trailer
+          </a>
+          <a href="#" className="save-later-link">
+            <FaBookmark />
+            save for later
+          </a>
         </div>
       </div>
-    )
+    </div>
+  );
 }
 
 export default AppContainer;
