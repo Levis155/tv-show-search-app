@@ -17,7 +17,7 @@ import { format } from "date-fns";
 function AppContainer() {
   const [searchedShow, setSearchedShow] = useState("");
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
+  const { data, isFetching, isError, refetch } = useQuery({
     queryKey: ["get-show-data"],
     queryFn: async () => {
       const response = await axios.get(
@@ -45,24 +45,24 @@ function AppContainer() {
             setSearchedShow(e.target.value);
           }}
         />
-        <button>
+        <button disabled={isFetching}>
           <FaSearch />
         </button>
       </form>
 
-      {isLoading && (
+      {isFetching && (
         <div className="loader-container">
           <PulseLoader size={30} color="#f5c417" />
         </div>
       )}
 
-      {isError && (
+      {!isFetching &&isError && (
         <div className="error-container">
-          <h1>something went wrong</h1>
+          <h1>could not get your show</h1>
         </div>
       )}
 
-      {data && (
+      {!isFetching &&!isError  &&data && (
         <div className="show-card-container">
           <ShowCard
             key={data.id}
