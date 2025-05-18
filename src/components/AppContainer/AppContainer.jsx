@@ -161,10 +161,6 @@ function ShowCard({
             <FaPlay />
             watch trailer
           </a>
-          <a href="#" className="save-later-link">
-            <FaBookmark />
-            save for later
-          </a>
         </div>
       </div>
     </div>
